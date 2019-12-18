@@ -12,7 +12,9 @@ from s3_object_lister import list_expired_objects
 
 
 def get_arg(index, default_value=''):
-    return sys.argv[index] if len(sys.argv) > 1 else default_value
+    if len(sys.argv) <= index:
+        return default_value
+    return sys.argv[index]
 
 
 mode = get_arg(1)
@@ -20,11 +22,11 @@ prefix = get_arg(2, 'archive/dev')
 max_days = get_arg(3, 365)
 
 bucket_name = 'uux-itaas-packager-catalog-data'
-expire_date = datetime.now(timezone.utc) - timedelta(days=365)
+expire_date = datetime.now(timezone.utc) - timedelta(days=int(max_days))
 
 if mode.lower() == 'clean':
     clean_expired_objects(bucket_name, prefix, expire_date)
-else:
+if mode.lower() == 'list':
     list_expired_objects(bucket_name, prefix, expire_date)
 
 print()
